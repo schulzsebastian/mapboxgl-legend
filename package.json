@@ -1,0 +1,19 @@
+{
+  "name": "mapboxgl-legend",
+  "version": "1.0.0",
+  "description": "Mapbox GL layers control",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/schulzsebastian/mapboxgl-legend.git"
+  },
+  "author": "Sebastian Schulz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/schulzsebastian/mapboxgl-legend/issues"
+  },
+  "homepage": "https://github.com/schulzsebastian/mapboxgl-legend#readme"
+}
