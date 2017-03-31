@@ -16,22 +16,25 @@ class MapboxLegend {
         this._container.innerHTML = ''
         let ul = document.createElement('ul')
         for(let layer of this._overlays){
-            let li = document.createElement('li')
-            let li_text = document.createTextNode(layer.id)
-            let check = document.createElement("input");
-            check.setAttribute("type", "checkbox")
-            check.id = layer.id
-            this._map.on('load', () => {
-                if(this._map.getLayoutProperty('Point layer', 'visibility') == 'visible'){
-                    check.checked = true
-                }
-            })
-            li.appendChild(check)
-            li.appendChild(li_text)
-            ul.appendChild(li)
-            check.addEventListener('change', this._toggleLayer.bind(this))
+            ul.appendChild(this._createLi(layer))
         }
         this._container.appendChild(ul)
+    }
+    _createLi(layer) {
+        let li = document.createElement('li')
+        let li_text = document.createTextNode(layer.id)
+        let check = document.createElement('input');
+        check.setAttribute('type', 'checkbox')
+        check.id = layer.id
+        li.appendChild(check)
+        li.appendChild(li_text)
+        check.addEventListener('change', this._toggleLayer.bind(this))
+        let visibility = this._map.getLayoutProperty(layer.id, 'visibility')
+        if(visibility == 'visible' || visibility == undefined){
+            this._map.setLayoutProperty(layer.id, 'visibility', 'visible')
+            check.checked = true
+        }   
+        return li
     }
     _toggleLayer(e) {
         if(e.target.checked){

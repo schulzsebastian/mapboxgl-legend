@@ -30,27 +30,47 @@
             51.29502826533429
           ]
         }
+      },
+      'Point layer 2': {
+        type: 'Feature',
+        properties: {
+          'test': 'test'
+        },
+        geometry: {
+          type: 'Point',
+          coordinates: [
+            15.65070858448744,
+            51.39502826533429
+          ]
+        }
       }
     }
-    let overlays = []
-    let layer = {
-      'id': 'Point layer',
-      'source': 'Point layer',
-      'type': 'circle',
-      'paint': {
-        'circle-radius': 10,
-        'circle-color': '#007cbf'
+    const loadLayers = layersObj => {
+      let overlays = []
+      for(let layer in layersObj){
+        overlays.push({
+          'id': layer,
+          'source': layer,
+          'type': 'circle',
+          'paint': {
+            'circle-radius': 10,
+            'circle-color': '#007cbf'
+          }
+        })
       }
+      return overlays
     }
-    overlays.push(layer)
+    let overlays = loadLayers(data)
     map.on('load', () => {
-      map.addSource('Point layer', {
-        'type': 'geojson',
-        'data': data['Point layer']
-      })
-      map.addLayer(overlays[0])
+      for(let layer of overlays){
+        map.addSource(layer.id, {
+          'type': 'geojson',
+          'data': data[layer.id]
+        })
+        map.addLayer(layer)
+      }
+      const legend = new MapboxLegend(overlays)
+      map.addControl(legend)
     })
-    const legend = new MapboxLegend(overlays)
-    map.addControl(legend)
   </script>
 </html>
