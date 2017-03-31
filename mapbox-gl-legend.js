@@ -30,19 +30,45 @@ class MapboxLegend {
     }
     _createLi(layer) {
         let li = document.createElement('li')
-        let li_text = document.createTextNode(`${layer.id} ↑ ↓`)
+        let li_text = document.createTextNode(`${layer.id}`)
         let check = document.createElement('input')
         check.setAttribute('type', 'checkbox')
         check.id = layer.id
+        let up = document.createElement('a')
+        up.style.float = 'right'
+        up.id = layer.id
+        let up_text = document.createTextNode('↑')
+        up.appendChild(up_text)
+        let down = document.createElement('a')
+        down.style.float = 'right'
+        down.id = layer.id
+        let down_text = document.createTextNode('↓')
+        down.appendChild(down_text)
         li.appendChild(check)
         li.appendChild(li_text)
+        li.appendChild(down)
+        li.appendChild(up)
         check.addEventListener('change', this._toggleLayer.bind(this))
+        up.addEventListener('click', this._upLayer.bind(this))
+        down.addEventListener('click', this._downLayer.bind(this))
         let visibility = this._map.getLayoutProperty(layer.id, 'visibility')
         if(visibility == 'visible' || visibility == undefined){
             this._map.setLayoutProperty(layer.id, 'visibility', 'visible')
             check.checked = true
         }   
         return li
+    }
+    _upLayer(e) {
+        let layerId = e.target.getAttribute('id')
+        let idx = this._order.indexOf(layerId)
+        if(idx == 0) return
+        console.log(idx)
+    }
+    _downLayer(e) {
+        let layerId = e.target.getAttribute('id')
+        let idx = this._order.indexOf(layerId)
+        if(idx == this._order.length - 1) return
+        console.log(idx)
     }
     _toggleLayer(e) {
         if(e.target.checked) this._showLayer(e.target.getAttribute('id'))
