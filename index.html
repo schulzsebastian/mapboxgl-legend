@@ -14,54 +14,89 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://openmaptiles.github.io/osm-bright-gl-style/style-cdn.json',
-      center: [19.401855467786135, 51.84935276355813],
-      zoom: 5
+      center: [16.913988783638445, 52.357498181163635],
+      zoom: 8
     })
     const data = {
-      'Point layer': {
+      'Polygon': {
         type: 'Feature',
         properties: {
-          'test': 'test'
+          'type': 'Polygon'
         },
         geometry: {
-          type: 'Point',
+          type: 'Polygon',
+          coordinates: [[
+            [16.79685115814209,52.45684622754481],
+            [17.103095054626465,52.45600939264076],
+            [17.083868980407715,52.29924157848631],
+            [16.696600914001465,52.300081389496114],
+            [16.79685115814209,52.45684622754481]
+          ]]
+        }
+      },
+      'Line': {
+        type: 'Feature',
+        properties: {
+          'type': 'LineString'
+        },
+        geometry: {
+          type: 'LineString',
           coordinates: [
-            15.55070858448744,
-            51.29502826533429
+            [16.930060386657715,52.565499392715374],
+            [16.84628963470459,52.19750685699392]
           ]
         }
       },
-      'Point layer 2': {
+      'Point': {
         type: 'Feature',
         properties: {
-          'test': 'test'
+          'type': 'Point'
         },
         geometry: {
           type: 'Point',
-          coordinates: [
-            15.65070858448744,
-            51.39502826533429
-          ]
+          coordinates: [16.895824670791626,52.39501823939772]
         }
       }
     }
     const loadLayers = layersObj => {
       let overlays = []
       for(let layer in layersObj){
-        overlays.push({
-          'id': layer,
-          'source': layer,
-          'type': 'circle',
-          'paint': {
-            'circle-radius': 10,
-            'circle-color': '#007cbf'
-          }
-        })
+        if(layersObj[layer].geometry.type == 'Point'){
+          overlays.push({
+            'id': layer,
+            'source': layer,
+            'type': 'circle',
+            'paint': {
+              'circle-radius': 10,
+              'circle-color': '#007cbf'
+            }
+          })
+        }else if(layersObj[layer].geometry.type == 'Polygon'){
+          overlays.push({
+            'id': layer,
+            'source': layer,
+            'type': 'fill',
+            'paint': {
+              'fill-color': '#e50000',
+              'fill-opacity': 1
+            }
+          })
+        }else if(layersObj[layer].geometry.type == 'LineString'){
+          overlays.push({
+            'id': layer,
+            'source': layer,
+            'type': 'line',
+            'paint': {
+              'line-color': '#007300',
+              'line-width': 8
+            }
+          })
+        }
       }
       return overlays
     }
-    let overlays = loadLayers(data)
     map.on('load', () => {
+      let overlays = loadLayers(data)
       for(let layer of overlays){
         map.addSource(layer.id, {
           'type': 'geojson',
@@ -69,7 +104,7 @@
         })
         map.addLayer(layer)
       }
-      const legend = new MapboxLegend(overlays)
+      const legend = new MapboxLegend(overlays, ['Point', 'Line', 'Polygon'])
       map.addControl(legend)
     })
   </script>

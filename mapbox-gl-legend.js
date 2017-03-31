@@ -1,8 +1,10 @@
 const className = 'mapboxgl-ctrl mapbox-gl-legend'
 
 class MapboxLegend {
-    constructor(overlays) {
+    constructor(overlays, order) {
         this._overlays = overlays
+        if(order == undefined) this._order = overlays.map(layer => {return layer.id})
+        else this._order = order
         this._container = document.createElement('div')
         this._container.className = `${className}`
         this.addCSS()
@@ -13,16 +15,19 @@ class MapboxLegend {
         return this._container
     }
     _updateOverlays() {
+        console.log('rendering legend...')
         this._container.innerHTML = ''
         let ul = document.createElement('ul')
-        for(let layer of this._overlays){
+        for(let layerId of this._order){
+            let layer = this._overlays.filter(l => {return l.id == layerId})[0]
             ul.appendChild(this._createLi(layer))
         }
+        for(let layerId of this._order.slice().reverse()) this._map.moveLayer(layerId)
         this._container.appendChild(ul)
     }
     _createLi(layer) {
         let li = document.createElement('li')
-        let li_text = document.createTextNode(layer.id)
+        let li_text = document.createTextNode(`${layer.id} ↑ ↓`)
         let check = document.createElement('input');
         check.setAttribute('type', 'checkbox')
         check.id = layer.id
@@ -37,11 +42,8 @@ class MapboxLegend {
         return li
     }
     _toggleLayer(e) {
-        if(e.target.checked){
-            this._map.setLayoutProperty(e.target.getAttribute('id'), 'visibility', 'visible')
-        }else{
-            this._map.setLayoutProperty(e.target.getAttribute('id'), 'visibility', 'none')
-        }
+        if(e.target.checked) this._map.setLayoutProperty(e.target.getAttribute('id'), 'visibility', 'visible')
+        else this._map.setLayoutProperty(e.target.getAttribute('id'), 'visibility', 'none')
     }
     onRemove() {
         this._container.parentNode.removeChild(this._container)
