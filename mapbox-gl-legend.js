@@ -7,12 +7,15 @@ class MapboxLegend {
         else this._order = order
         this._container = document.createElement('div')
         this._container.className = `${className}`
-        this.addCSS()
+        this._addCSS()
     }
     onAdd(map) {
         this._map = map
         this._updateOverlays()
         return this._container
+    }
+    onRemove() {
+        this._container.parentNode.removeChild(this._container)
     }
     _updateOverlays() {
         console.log('rendering legend...')
@@ -28,7 +31,7 @@ class MapboxLegend {
     _createLi(layer) {
         let li = document.createElement('li')
         let li_text = document.createTextNode(`${layer.id} ↑ ↓`)
-        let check = document.createElement('input');
+        let check = document.createElement('input')
         check.setAttribute('type', 'checkbox')
         check.id = layer.id
         li.appendChild(check)
@@ -42,15 +45,22 @@ class MapboxLegend {
         return li
     }
     _toggleLayer(e) {
-        if(e.target.checked) this._map.setLayoutProperty(e.target.getAttribute('id'), 'visibility', 'visible')
-        else this._map.setLayoutProperty(e.target.getAttribute('id'), 'visibility', 'none')
+        if(e.target.checked) this._showLayer(e.target.getAttribute('id'))
+        else this._hideLayer(e.target.getAttribute('id'))
     }
-    onRemove() {
-        this._container.parentNode.removeChild(this._container)
+    _showLayer(layerId) {
+        this._map.setLayoutProperty(layerId, 'visibility', 'visible')
     }
-    addCSS() {
-        const css = document.createElement('style');
-        css.type = 'text/css';
+    _hideLayer(layerId) {
+        this._map.setLayoutProperty(layerId, 'visibility', 'none')
+    }
+    _changeOrder(newOrder) {
+        this._order = newOrder
+        this._updateOverlays()
+    }
+    _addCSS() {
+        const css = document.createElement('style')
+        css.type = 'text/css'
         css.innerHTML = `
         .mapbox-gl-legend {
             margin: 25px;
@@ -58,11 +68,11 @@ class MapboxLegend {
             background: red;
             position: relative;
         }
-        .mapbox-gl-legend ul{
+        .mapbox-gl-legend ul {
             list-style: none;
             padding: 0;
         }`
-        document.body.appendChild(css);
+        document.body.appendChild(css)
     }
 }
 
