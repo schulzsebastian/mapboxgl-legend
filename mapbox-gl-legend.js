@@ -60,6 +60,9 @@ class MapboxLegend {
     }
     _addCSS() {
         const css = document.createElement('style')
+        let display
+        if(this._overlays.length > 0 ) display = 'in-line'
+        else display = 'none'
         css.type = 'text/css'
         css.innerHTML = `
         .mapbox-gl-legend {
@@ -67,6 +70,7 @@ class MapboxLegend {
             padding: 5px;
             background: red;
             position: relative;
+            display: ${display}
         }
         .mapbox-gl-legend ul {
             list-style: none;
