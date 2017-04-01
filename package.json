@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/schulzsebastian/mapboxgl-legend/issues"
   },
-  "homepage": "https://github.com/schulzsebastian/mapboxgl-legend#readme"
+  "homepage": "https://github.com/schulzsebastian/mapboxgl-legend#readme",
+  "dependencies": {
+    "mapbox-gl": "^0.34.0"
+  }
 }

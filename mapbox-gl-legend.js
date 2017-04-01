@@ -1,10 +1,16 @@
 const className = 'mapboxgl-ctrl mapbox-gl-legend'
+const defaultOptions = {
+    'order': 'qgis',
+    'customOrder': []
+}
 
 class MapboxLegend {
-    constructor(overlays, order) {
+    constructor(overlays, options) {
         this._overlays = overlays
-        if(order == undefined) this._order = overlays.map(layer => {return layer.id})
-        else this._order = order
+        if(options == undefined) this._options = defaultOptions
+        else this._options = options
+        if(this._options.customOrder == undefined || this._options.customOrder.length == 0) this._order = overlays.map(layer => {return layer.id})
+        else this._order = this._options.customOrder
         this._container = document.createElement('div')
         this._container.className = `${className}`
         this._addCSS()
@@ -17,18 +23,28 @@ class MapboxLegend {
     onRemove() {
         this._container.parentNode.removeChild(this._container)
     }
+    changeOrder(newOrder) {
+        this._order = newOrder
+        this._updateOverlays()
+    }
+    updateLegend(overlays, order){
+        this._overlays = overlays
+        if(order == undefined) this._order = overlays.map(layer => {return layer.id})
+        else this._order = order
+        this._updateOverlays()
+    }
     _updateOverlays() {
-        console.log('rendering legend...')
         this._container.innerHTML = ''
         let ul = document.createElement('ul')
         for(let layerId of this._order){
             let layer = this._overlays.filter(l => {return l.id == layerId})[0]
-            ul.appendChild(this._createLi(layer))
+            ul.appendChild(this._createOverlay(layer))
         }
-        for(let layerId of this._order.slice().reverse()) this._map.moveLayer(layerId)
+        if(this._options.order == 'qgis') for(let layerId of this._order.slice().reverse()) this._map.moveLayer(layerId)
+        else for(let layerId of this._order) this._map.moveLayer(layerId)
         this._container.appendChild(ul)
     }
-    _createLi(layer) {
+    _createOverlay(layer) {
         let li = document.createElement('li')
         let li_text = document.createTextNode(`${layer.id}`)
         let check = document.createElement('input')
@@ -62,13 +78,15 @@ class MapboxLegend {
         let layerId = e.target.getAttribute('id')
         let idx = this._order.indexOf(layerId)
         if(idx == 0) return
-        console.log(idx)
+        this._order.splice(idx - 1, 0, this._order.splice(idx, 1)[0])
+        this._updateOverlays()
     }
     _downLayer(e) {
         let layerId = e.target.getAttribute('id')
         let idx = this._order.indexOf(layerId)
         if(idx == this._order.length - 1) return
-        console.log(idx)
+        this._order.splice(idx + 1, 0, this._order.splice(idx, 1)[0])
+        this._updateOverlays()
     }
     _toggleLayer(e) {
         if(e.target.checked) this._showLayer(e.target.getAttribute('id'))
@@ -79,10 +97,6 @@ class MapboxLegend {
     }
     _hideLayer(layerId) {
         this._map.setLayoutProperty(layerId, 'visibility', 'none')
-    }
-    _changeOrder(newOrder) {
-        this._order = newOrder
-        this._updateOverlays()
     }
     _addCSS() {
         const css = document.createElement('style')
