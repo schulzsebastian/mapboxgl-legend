@@ -36,9 +36,7 @@ map.on('load', () => {
     }
   }
   map.addLayer(overlays['Point Layer'])
-  const legend = new MapboxLegend(overlays, {
-    order: 'qgis'
-  })
+  const legend = new MapboxLegend(overlays)
   map.addControl(legend)
 })
 ```
