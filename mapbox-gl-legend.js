@@ -12,7 +12,7 @@ class MapboxLegend {
         if(options == undefined) this._options = defaultOptions
         else this._options = options
         // If the order is not specified - set object order
-        if(this._options.customOrder == undefined || this._options.customOrder.length == 0) this._order = Object.keys(overlays)
+        if(this._options.customOrder == undefined || this._options.customOrder.length == 0) this._order = Object.keys(overlays).map((layerName) => overlays[layerName].id)
         else this._order = this._options.customOrder
         // Creating legend container
         this._container = document.createElement('div')
@@ -44,14 +44,18 @@ class MapboxLegend {
         // Creating a list
         let ul = document.createElement('ul')
         // Creating list elements for each layer
-        for(let layerId of this._order) ul.appendChild(this._createOverlay(this._overlays[layerId]))
+        for(let layerId of this._order){
+            for(let layerName in this._overlays){
+                if(this._overlays[layerName].id == layerId) ul.appendChild(this._createOverlay(layerName, this._overlays[layerName]))
+            }
+        }
         // Depends on the options set render order
         if(this._options.order == 'qgis') for(let layerId of this._order.slice().reverse()) this._map.moveLayer(layerId)
         else for(let layerId of this._order) this._map.moveLayer(layerId)
         // Appending list to legend
         this._container.appendChild(ul)
     }
-    _createOverlay(layer) {
+    _createOverlay(layerName, layer) {
         // Creating list element
         let li = document.createElement('li')
         // Creating checkbox for toggle layer
@@ -70,7 +74,7 @@ class MapboxLegend {
         down.appendChild(document.createTextNode('↓'))
         // Appending to list element checkbox, layer name and buttons
         li.appendChild(check)
-        li.appendChild(document.createTextNode(`${layer.id}`))
+        li.appendChild(document.createTextNode(`${layerName}`))
         li.appendChild(down)
         li.appendChild(up)
         // Event listener for checkbox
