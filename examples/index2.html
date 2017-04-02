@@ -17,68 +17,33 @@
       center: [16.913988783638445, 52.357498181163635],
       zoom: 8
     })
-    let legend
     map.on('load', () => {
-      map.addSource('sourceid_layer', {
-        'type': 'geojson',
-        'data': {
+      map.addSource('layer_source', {
+        type: 'geojson',
+        data: {
           type: 'Feature',
           properties: {
-            'type': 'Polygon'
+            'type': 'Point'
           },
           geometry: {
-            type: 'Polygon',
-            coordinates: [[
-              [16.79685115814209,52.45684622754481],
-              [17.103095054626465,52.45600939264076],
-              [17.083868980407715,52.29924157848631],
-              [16.696600914001465,52.300081389496114],
-              [16.79685115814209,52.45684622754481]
-            ]]
-          }
-        }
-      })
-      map.addSource('sourceid_layer2', {
-        'type': 'geojson',
-        'data': {
-          type: 'Feature',
-          properties: {
-            'type': 'Polygon'
-          },
-          geometry: {
-            type: 'Polygon',
-            coordinates: [[
-              [16.79685115814209,52.45684622754481],
-              [17.103095054626465,52.45600939264076],
-              [17.083868980407715,52.29924157848631],
-              [16.696600914001465,52.300081389496114],
-              [16.79685115814209,52.45684622754481]
-            ]]
+            type: 'Point',
+            coordinates: [16.895824670791626,52.39501823939772]
           }
         }
       })
       let overlays = {
-        'Layer Name Point': {
-          'id': 'id_layer',
-          'source': 'sourceid_layer',
+        'Point Layer': {
+          'id': 'layer_id',
+          'source': 'layer_source',
           'type': 'circle',
           'paint': {
             'circle-radius': 10,
             'circle-color': '#007cbf'
           }
-        },
-        'Layer Name Polygon': {
-          'id': 'id_layer2',
-          'source': 'sourceid_layer2',
-          'type': 'fill',
-          'paint': {
-            'fill-color': '#e50000',
-            'fill-opacity': 1
-          }
         }
       }
-      for(let layerName in overlays) map.addLayer(overlays[layerName])
-      legend = new MapboxLegend(overlays)
+      map.addLayer(overlays['Point Layer'])
+      const legend = new MapboxLegend(overlays)
       map.addControl(legend)
     })
   </script>
