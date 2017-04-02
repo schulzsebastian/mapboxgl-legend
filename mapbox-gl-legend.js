@@ -12,7 +12,7 @@ class MapboxLegend {
         if(options == undefined) this._options = defaultOptions
         else this._options = options
         // If the order is not specified - set object order
-        if(this._options.customOrder == undefined || this._options.customOrder.length == 0) this._order = overlays.map(layer => {return layer.id})
+        if(this._options.customOrder == undefined || this._options.customOrder.length == 0) this._order = Object.keys(overlays)
         else this._order = this._options.customOrder
         // Creating legend container
         this._container = document.createElement('div')
@@ -44,10 +44,7 @@ class MapboxLegend {
         // Creating a list
         let ul = document.createElement('ul')
         // Creating list elements for each layer
-        for(let layerId of this._order){
-            let layer = this._overlays.filter(l => {return l.id == layerId})[0]
-            ul.appendChild(this._createOverlay(layer))
-        }
+        for(let layerId of this._order) ul.appendChild(this._createOverlay(this._overlays[layerId]))
         // Depends on the options set render order
         if(this._options.order == 'qgis') for(let layerId of this._order.slice().reverse()) this._map.moveLayer(layerId)
         else for(let layerId of this._order) this._map.moveLayer(layerId)
@@ -125,7 +122,7 @@ class MapboxLegend {
     _addCSS() {
         const css = document.createElement('style')
         let display
-        if(this._overlays.length > 0 ) display = 'in-line'
+        if(Object.keys(this._overlays).length > 0) display = 'in-line'
         else display = 'none'
         css.type = 'text/css'
         css.innerHTML = `
