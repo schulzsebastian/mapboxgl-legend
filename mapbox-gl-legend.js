@@ -12,7 +12,9 @@ class MapboxLegend {
         if(options == undefined) this._options = defaultOptions
         else this._options = options
         // If the order is not specified - set object order
-        if(this._options.customOrder == undefined || this._options.customOrder.length == 0) this._order = Object.keys(overlays).map((layerName) => overlays[layerName].id)
+        if(this._options.customOrder == undefined || this._options.customOrder.length == 0){
+            this._order = Object.keys(overlays).map((layerName) => overlays[layerName].id)
+        }
         else this._order = this._options.customOrder
         // Creating legend container
         this._container = document.createElement('div')
@@ -126,7 +128,7 @@ class MapboxLegend {
     _addCSS() {
         const css = document.createElement('style')
         let display
-        if(Object.keys(this._overlays).length > 0) display = 'in-line'
+        if(this._order.length > 0) display = 'in-line'
         else display = 'none'
         css.type = 'text/css'
         css.innerHTML = `
