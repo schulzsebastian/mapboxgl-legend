@@ -105,7 +105,11 @@
         })
         map.addLayer(overlays[layer])
       }
-      legend = new MapboxLegend(overlays)
+      let basemaps = {
+        'OSM Bright': 'https://openmaptiles.github.io/osm-bright-gl-style/style-cdn.json',
+        'OSM Dark': 'https://openmaptiles.github.io/dark-matter-gl-style/style-cdn.json'
+      }
+      legend = new MapboxLegend(overlays, basemaps)
       map.addControl(legend)
     })
   </script>
