@@ -35,8 +35,11 @@ map.on('load', () => {
       }
     }
   }
+  let basemaps = {
+    'OSM Bright': 'https://openmaptiles.github.io/osm-bright-gl-style/style-cdn.json'
+  }
   map.addLayer(overlays['Point Layer'])
-  const legend = new MapboxLegend(overlays)
+  const legend = new MapboxLegend(overlays, basemaps)
   map.addControl(legend)
 })
 ```

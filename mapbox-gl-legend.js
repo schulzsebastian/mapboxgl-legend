@@ -16,14 +16,14 @@ class MapboxLegend {
         else this._options = options
         // If the order of overlays is not specified - set object order
         if(this._options.overlaysOrder == undefined || this._options.overlaysOrder.length == 0){
-            this._overlaysOrder = Object.keys(overlays).map((layerName) => overlays[layerName].id)
+            this._overlaysOrder = Object.keys(overlays).map(layerName => overlays[layerName].id)
         }
         else this._overlaysOrder = this._options.overlaysOrder
         // If the order of basemaps is not specified - set object order
         if(this._options.basemapsOrder == undefined || this._options.basemapsOrder.length == 0) this._basemapsOrder = Object.keys(basemaps)
         else this._basemapsOrder = this._options.basemapsOrder
-        // Cache sources
-        this._sources = Object.keys(overlays).map((layerName) => overlays[layerName].source)
+        // Cache sources for refreshing data after basemap change
+        this._sources = Object.keys(overlays).map(layerName => overlays[layerName].source)
         // Creating legend container
         this._container = document.createElement('div')
         this._container.className = `${className}`
@@ -51,8 +51,12 @@ class MapboxLegend {
     _updateLegend() {
         // Clearing legend
         this._container.innerHTML = ''
+        // Creating basemaps list
         this._updateBasemaps()
+        // Creating overlays list
         this._updateOverlays()
+        // Try check chosen basemap
+        this._checkChosenBasemap()
     }
     _updateBasemaps() {
         // Creating a list
@@ -92,16 +96,19 @@ class MapboxLegend {
         // Creating checkbox for toggle layer
         let check = document.createElement('input')
         check.setAttribute('type', 'checkbox')
-        check.id = layer.id
+        check.setAttribute('layer', layer.id)
+        check.id = `${layer.id.replace(/^[^a-z]+|[^\w:.-]+/gi, "")}-layer`
         // Creating up button
         let up = document.createElement('a')
         up.style.float = 'right'
-        up.id = layer.id
+        up.setAttribute('layer', layer.id)
+        up.id = `${layer.id.replace(/^[^a-z]+|[^\w:.-]+/gi, "")}-layer`
         up.appendChild(document.createTextNode('↑'))
         // Creating down button
         let down = document.createElement('a')
         down.style.float = 'right'
-        down.id = layer.id
+        down.setAttribute('layer', layer.id)
+        down.id = `${layer.id.replace(/^[^a-z]+|[^\w:.-]+/gi, "")}-layer`
         down.appendChild(document.createTextNode('↓'))
         // Appending to list element checkbox, layer name and buttons
         li.appendChild(check)
@@ -124,20 +131,26 @@ class MapboxLegend {
         // Return list element
         return li
     }
-    _createBasemap(layerName, layer) {
+    _createBasemap(basemapName, layer) {
+        // Creating list element
         let li = document.createElement('li')
+        // Creating radio button
         let radio = document.createElement('input')
         radio.setAttribute('type', 'radio')
         radio.setAttribute('name', 'basemaps')
-        radio.id = layerName
+        radio.setAttribute('basemap', basemapName)
+        radio.id = `${basemapName.replace(/^[^a-z]+|[^\w:.-]+/gi, "")}-basemap`
+        // Appending to list radio and layer name
         li.appendChild(radio)
-        li.appendChild(document.createTextNode(`${layerName}`))
-        radio.addEventListener('click', this._selectBasemap.bind(this))
+        li.appendChild(document.createTextNode(`${basemapName}`))
+        // Event listener for radio
+        radio.addEventListener('change', this._selectBasemap.bind(this))
+        // Return list element
         return li
     }
     _upLayer(e) {
         // Return if layer is the first one
-        let layerId = e.target.getAttribute('id')
+        let layerId = e.target.getAttribute('layer')
         let idx = this._overlaysOrder.indexOf(layerId)
         if(idx == 0) return
         // Move layer to index - 1
@@ -147,7 +160,7 @@ class MapboxLegend {
     }
     _downLayer(e) {
         // Return if layer is the last one
-        let layerId = e.target.getAttribute('id')
+        let layerId = e.target.getAttribute('layer')
         let idx = this._overlaysOrder.indexOf(layerId)
         if(idx == this._overlaysOrder.length - 1) return
         // Move layer to index + 1
@@ -156,17 +169,29 @@ class MapboxLegend {
         this._updateOverlays()
     }
     _selectBasemap(e) {
+        // Get current sources
         let mapSources = this._map.getStyle().sources
-        this._map.setStyle(this._basemaps[e.target.getAttribute('id')])
+        // Change style and clear map data
+        this._map.setStyle(this._basemaps[e.target.getAttribute('basemap')])
+        // Load cached sources and layers
         setTimeout(() => {
             for(let sourceName in mapSources) if(this._sources.indexOf(sourceName) > -1) this._map.addSource(sourceName, mapSources[sourceName])
             for(let layerName in this._overlays) this._map.addLayer(this._overlays[layerName])
             this._updateOverlays()
         }, 1000)
     }
+    _checkChosenBasemap() {
+        for(let basemapName in this._basemaps){
+            fetch(this._basemaps[basemapName]).then(response => {return response.json()}).then(response => {
+                if(this._map.getStyle().name == response.name) {
+                    document.getElementById(`${basemapName.replace(/^[^a-z]+|[^\w:.-]+/gi, "")}-basemap`).checked = true
+                }
+            })
+        }
+    }
     _toggleLayer(e) {
-        if(e.target.checked) this._showLayer(e.target.getAttribute('id'))
-        else this._hideLayer(e.target.getAttribute('id'))
+        if(e.target.checked) this._showLayer(e.target.getAttribute('layer'))
+        else this._hideLayer(e.target.getAttribute('layer'))
     }
     _showLayer(layerId) {
         this._map.setLayoutProperty(layerId, 'visibility', 'visible')
