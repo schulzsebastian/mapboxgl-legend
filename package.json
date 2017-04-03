@@ -2,9 +2,9 @@
   "name": "mapbox-gl-legend",
   "version": "0.0.1",
   "description": "Mapbox GL layers control",
-  "main": "mapbox-gl-legend.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "babel": "babel --presets es2015 index.js -o dist/mapbox-gl-legend.js"
   },
   "repository": {
     "type": "git",
@@ -18,5 +18,10 @@
   "homepage": "https://github.com/schulzsebastian/mapboxgl-legend#readme",
   "dependencies": {
     "mapbox-gl": "^0.34.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.0",
+    "babel-core": "^6.24.0",
+    "babel-preset-es2015": "^6.24.0"
   }
 }
