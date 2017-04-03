@@ -20,10 +20,10 @@ class MapboxLegend {
         }
         else this._overlaysOrder = this._options.overlaysOrder
         // If the order of basemaps is not specified - set object order
-        if(this._options.basemapsOrder == undefined || this._options.basemapsOrder.length == 0){
-            this._basemapsOrder = Object.keys(basemaps)
-        }
+        if(this._options.basemapsOrder == undefined || this._options.basemapsOrder.length == 0) this._basemapsOrder = Object.keys(basemaps)
         else this._basemapsOrder = this._options.basemapsOrder
+        // Cache sources
+        this._sources = Object.keys(overlays).map((layerName) => overlays[layerName].source)
         // Creating legend container
         this._container = document.createElement('div')
         this._container.className = `${className}`
@@ -156,9 +156,13 @@ class MapboxLegend {
         this._updateOverlays()
     }
     _selectBasemap(e) {
+        let mapSources = this._map.getStyle().sources
         this._map.setStyle(this._basemaps[e.target.getAttribute('id')])
-        //TODO: caching and load sources/layers from cache
-        this._updateOverlays()
+        setTimeout(() => {
+            for(let sourceName in mapSources) if(this._sources.indexOf(sourceName) > -1) this._map.addSource(sourceName, mapSources[sourceName])
+            for(let layerName in this._overlays) this._map.addLayer(this._overlays[layerName])
+            this._updateOverlays()
+        }, 1000)
     }
     _toggleLayer(e) {
         if(e.target.checked) this._showLayer(e.target.getAttribute('id'))
