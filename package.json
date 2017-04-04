@@ -6,7 +6,8 @@
   "scripts": {
     "build:js": "babel --presets es2015 index.js -o dist/mapbox-gl-legend.js",
     "build:min": "uglifyjs dist/mapbox-gl-legend.js -mco dist/mapbox-gl-legend.min.js",
-    "build": "npm run build:js && npm run build:min"
+    "build": "npm run build:js && npm run build:min",
+    "test": "karma start karma.conf.js"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,11 @@
     "babel-cli": "^6.24.0",
     "babel-core": "^6.24.0",
     "babel-preset-es2015": "^6.24.0",
+    "jasmine-core": "^2.5.2",
+    "karma": "^1.5.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-cli": "^1.0.1",
+    "karma-jasmine": "^1.1.0",
     "uglifyjs": "^2.4.10"
   }
 }
