@@ -1,4 +1,5 @@
-const className = 'mapboxgl-ctrl mapboxgl-legend'
+const legendClass = 'mapboxgl-ctrl mapboxgl-legend'
+const legendListClass = 'mapboxgl-ctrl mapboxgl-legend-list'
 const defaultOptions = {
     'order': 'qgis',
     'overlaysOrder': [],
@@ -26,7 +27,7 @@ class MapboxLegend {
         this._sources = Object.keys(overlays).map(layerName => overlays[layerName].source)
         // Creating legend container
         this._container = document.createElement('div')
-        this._container.className = `${className}`
+        this._container.className = `${legendListClass}`
         // Loading CSS of legend
         this._addCSS()
     }
@@ -36,7 +37,16 @@ class MapboxLegend {
         // Run a function to create legend
         this._updateLegend()
         // onAdd method requires return an DOM element
-        return this._container
+        const wrapper = document.createElement('div')
+        wrapper.appendChild(this._container)
+        wrapper.className = `${legendClass}`
+        wrapper.addEventListener('mouseover', () => {
+            this._container.style.display = 'block'
+        })
+        wrapper.addEventListener('mouseout', () => {
+            this._container.style.display = 'none'
+        })
+        return wrapper
     }
     onRemove() {
         // onRemove method to destroy DOM element
@@ -207,13 +217,18 @@ class MapboxLegend {
         css.type = 'text/css'
         css.innerHTML = `
         .mapboxgl-legend {
-            margin: 25px;
-            padding: 5px;
+            min-height:30px;
+            min-width:30px;
+            background:blue;
+        }
+        .mapboxgl-legend-list {
+            padding: 10px;
             background: red;
             position: relative;
-            display: ${display}
+            display: none;
+            margin: 0 !important;
         }
-        .mapboxgl-legend ul {
+        .mapboxgl-legend-list ul {
             list-style: none;
             padding: 0;
         }`
