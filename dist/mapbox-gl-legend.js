@@ -247,7 +247,7 @@ var MapboxLegend = function () {
         }
     }, {
         key: '_createBasemap',
-        value: function _createBasemap(basemapName, layer) {
+        value: function _createBasemap(basemapName) {
             // Creating list element
             var li = document.createElement('li');
             // Creating radio button

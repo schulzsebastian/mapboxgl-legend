@@ -131,7 +131,7 @@ class MapboxLegend {
         // Return list element
         return li
     }
-    _createBasemap(basemapName, layer) {
+    _createBasemap(basemapName) {
         // Creating list element
         let li = document.createElement('li')
         // Creating radio button
