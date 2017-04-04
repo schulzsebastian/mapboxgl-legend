@@ -184,11 +184,11 @@ class MapboxLegend {
         // Change style and clear map data
         this._map.setStyle(this._basemaps[e.target.getAttribute('basemap')])
         // Load cached sources and layers
-        setTimeout(() => {
+        this._map.style.once('data', () => {
             for(let sourceName in mapSources) if(this._sources.indexOf(sourceName) > -1) this._map.addSource(sourceName, mapSources[sourceName])
             for(let layerName in this._overlays) this._map.addLayer(this._overlays[layerName])
             this._updateOverlays()
-        }, 1000)
+        })
     }
     _checkChosenBasemap() {
         for(let basemapName in this._basemaps){

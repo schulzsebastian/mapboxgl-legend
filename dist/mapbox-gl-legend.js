@@ -4,7 +4,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var className = 'mapboxgl-ctrl mapboxgl-legend';
+var legendClass = 'mapboxgl-ctrl mapboxgl-legend';
+var legendListClass = 'mapboxgl-ctrl mapboxgl-legend-list';
 var defaultOptions = {
     'order': 'qgis',
     'overlaysOrder': [],
@@ -35,7 +36,7 @@ var MapboxLegend = function () {
         });
         // Creating legend container
         this._container = document.createElement('div');
-        this._container.className = '' + className;
+        this._container.className = '' + legendListClass;
         // Loading CSS of legend
         this._addCSS();
     }
@@ -43,12 +44,23 @@ var MapboxLegend = function () {
     _createClass(MapboxLegend, [{
         key: 'onAdd',
         value: function onAdd(map) {
+            var _this = this;
+
             // Define map object in class
             this._map = map;
             // Run a function to create legend
             this._updateLegend();
             // onAdd method requires return an DOM element
-            return this._container;
+            var wrapper = document.createElement('div');
+            wrapper.appendChild(this._container);
+            wrapper.className = '' + legendClass;
+            wrapper.addEventListener('mouseover', function () {
+                _this._container.style.display = 'block';
+            });
+            wrapper.addEventListener('mouseout', function () {
+                _this._container.style.display = 'none';
+            });
+            return wrapper;
         }
     }, {
         key: 'onRemove',
@@ -291,31 +303,31 @@ var MapboxLegend = function () {
     }, {
         key: '_selectBasemap',
         value: function _selectBasemap(e) {
-            var _this = this;
+            var _this2 = this;
 
             // Get current sources
             var mapSources = this._map.getStyle().sources;
             // Change style and clear map data
             this._map.setStyle(this._basemaps[e.target.getAttribute('basemap')]);
             // Load cached sources and layers
-            setTimeout(function () {
+            this._map.style.once('data', function () {
                 for (var sourceName in mapSources) {
-                    if (_this._sources.indexOf(sourceName) > -1) _this._map.addSource(sourceName, mapSources[sourceName]);
-                }for (var layerName in _this._overlays) {
-                    _this._map.addLayer(_this._overlays[layerName]);
-                }_this._updateOverlays();
-            }, 1000);
+                    if (_this2._sources.indexOf(sourceName) > -1) _this2._map.addSource(sourceName, mapSources[sourceName]);
+                }for (var layerName in _this2._overlays) {
+                    _this2._map.addLayer(_this2._overlays[layerName]);
+                }_this2._updateOverlays();
+            });
         }
     }, {
         key: '_checkChosenBasemap',
         value: function _checkChosenBasemap() {
-            var _this2 = this;
+            var _this3 = this;
 
             var _loop = function _loop(basemapName) {
-                fetch(_this2._basemaps[basemapName]).then(function (response) {
+                fetch(_this3._basemaps[basemapName]).then(function (response) {
                     return response.json();
                 }).then(function (response) {
-                    if (_this2._map.getStyle().name == response.name) {
+                    if (_this3._map.getStyle().name == response.name) {
                         document.getElementById(basemapName.replace(/^[^a-z]+|[^\w:.-]+/gi, "") + '-basemap').checked = true;
                     }
                 });
@@ -347,7 +359,7 @@ var MapboxLegend = function () {
             var display = void 0;
             if (this._overlaysOrder.length > 0) display = 'in-line';else display = 'none';
             css.type = 'text/css';
-            css.innerHTML = '\n        .mapboxgl-legend {\n            margin: 25px;\n            padding: 5px;\n            background: red;\n            position: relative;\n            display: ' + display + '\n        }\n        .mapboxgl-legend ul {\n            list-style: none;\n            padding: 0;\n        }';
+            css.innerHTML = '\n        .mapboxgl-legend {\n            min-height:30px;\n            min-width:30px;\n            background:blue;\n        }\n        .mapboxgl-legend-list {\n            padding: 10px;\n            background: red;\n            position: relative;\n            display: none;\n            margin: 0 !important;\n        }\n        .mapboxgl-legend-list ul {\n            list-style: none;\n            padding: 0;\n        }';
             document.body.appendChild(css);
         }
     }]);
